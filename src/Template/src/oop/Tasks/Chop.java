@@ -13,7 +13,7 @@ import com.runemate.game.api.script.framework.task.Task;
 
 public class Chop extends Task {
 
-	private final String CHOP = "Chop down";
+	private final String CHOP = "Chop down", TREE = "Willow";
 
 	@Override
 	public boolean validate() {
@@ -23,7 +23,7 @@ public class Chop extends Task {
 
 	@Override
 	public void execute() {
-		GameObject tree = GameObjects.newQuery().names("Willow").actions(CHOP).results().nearest();
+		GameObject tree = GameObjects.newQuery().names(TREE).actions(CHOP).results().nearest();
 		if(tree != null){
 			Camera.turnTo(tree);
 			if(!tree.isVisible()){
