@@ -5,11 +5,11 @@ import com.runemate.game.api.script.framework.LoopingBot;
 public class Main extends LoopingBot {
 
 	private enum State{
+
 	}
 
-	@Override
-	public void onStart(String... args){
-		System.out.println("Start");
+	private State getCurrentState(){
+		return null;
 	}
 
 	@Override
@@ -17,10 +17,13 @@ public class Main extends LoopingBot {
 	}
 
 	@Override
-	public void onStop(){
+	public void onStart(String... args){
+		super.onStart();
+		System.out.println("Starting");
 	}
 
-	private State getCurrentState(){
-		return null;
+	@Override
+	public void onStop(){
+		super.onStop();
 	}
 }
