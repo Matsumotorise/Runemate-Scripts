@@ -8,6 +8,7 @@ import com.runemate.game.api.hybrid.local.hud.interfaces.SpriteItem;
 import com.runemate.game.api.hybrid.location.Area;
 import com.runemate.game.api.hybrid.location.navigation.Path;
 import com.runemate.game.api.hybrid.location.navigation.basic.BresenhamPath;
+import com.runemate.game.api.hybrid.location.navigation.basic.ViewportPath;
 import com.runemate.game.api.hybrid.region.GameObjects;
 import com.runemate.game.api.hybrid.region.Players;
 import com.runemate.game.api.script.Execution;
@@ -15,9 +16,9 @@ import com.runemate.game.api.script.framework.LoopingBot;
 
 public class Main extends LoopingBot {
 
+	private final String CHOP = "Chop down", TREE = "Willow";
 	private Area bankArea, chopArea;
 	private boolean dropping;
-	private final String CHOP = "Chop down", TREE = "Willow";
 
 	@Override
 	public void onStart(String... args) {
@@ -63,7 +64,7 @@ public class Main extends LoopingBot {
 	}
 
 	private void chop() {
-		GameObject tree = GameObjects.newQuery().names(TREE).actions(CHOP).results().nearest();
+		GameObject tree = treeSearch();
 		if (tree != null) {
 			Camera.turnTo(tree);
 			if (!tree.isVisible()) {
@@ -77,12 +78,26 @@ public class Main extends LoopingBot {
 		}
 	}
 
-	private void walkToChop() {
-
+	private void walkToChopArea() {
+		BresenhamPath p = BresenhamPath.buildTo(chopArea.getRandomCoordinate());
+		if (p != null) {
+			if (chopArea.distanceTo(Players.getLocal()) >= 8 || !ViewportPath.convert(p).step()) {  // this will attempt to walk with the viewport if the distance to the destination is < 8
+				p.step();                                                                            // if it cant walk with viewport (camera not correctly set for example), step() will return false,
+				// causing the bot to walk with the minimap
+			}
+		}
+		walkDelay();
 	}
 
-	private void walkToBank() {
-
+	private void walkToBankArea() {
+		BresenhamPath p = BresenhamPath.buildTo(bankArea.getRandomCoordinate());
+		if (p != null) {
+			if (bankArea.distanceTo(Players.getLocal()) >= 8 || !ViewportPath.convert(p).step()) {  // this will attempt to walk with the viewport if the distance to the destination is < 8
+				p.step();                                                                            // if it cant walk with viewport (camera not correctly set for example), step() will return false,
+				// causing the bot to walk with the minimap
+			}
+		}
+		walkDelay();
 	}
 
 	private void bank() {
@@ -97,6 +112,10 @@ public class Main extends LoopingBot {
 		Execution.delayUntil(() -> !Players.getLocal().isMoving(), 4000, 6000);
 	}
 
+	private GameObject treeSearch() {
+		GameObjects.newQuery().names(TREE).actions(CHOP).results().nearest();
+	}
+
 	@Override
 	public void onLoop() {
 		switch (getCurrentState()) {
@@ -104,13 +123,13 @@ public class Main extends LoopingBot {
 				chop();
 				break;
 			case WALK_TO_CHOP:
-				walkToChop();
+				walkToChopArea();
 				break;
 			case BANK:
 				bank();
 				break;
 			case WALK_TO_BANK:
-				walkToBank();
+				walkToBankArea();
 				break;
 			case DROP:
 				drop();
