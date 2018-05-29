@@ -10,7 +10,6 @@ import com.runemate.game.api.hybrid.location.Area;
 import com.runemate.game.api.hybrid.location.Area.Circular;
 import com.runemate.game.api.hybrid.location.navigation.Path;
 import com.runemate.game.api.hybrid.location.navigation.basic.BresenhamPath;
-import com.runemate.game.api.hybrid.region.GameObjects;
 import com.runemate.game.api.hybrid.region.Players;
 import com.runemate.game.api.hybrid.util.Resources;
 import com.runemate.game.api.script.Execution;

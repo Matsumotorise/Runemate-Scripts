@@ -16,21 +16,22 @@ import com.runemate.game.api.script.framework.LoopingBot;
 import java.util.function.Predicate;
 
 public class Util {
+
 	private LoopingBot bot;
 
 	public Util(LoopingBot bot) {
 		this.bot = bot;
 	}
 
-	public void bank(Predicate<SpriteItem> filter){
+	public void bank(Predicate<SpriteItem> filter) {
 		bankAllExcept(filter.negate());
 	}
 
-	public void bankAllExcept(String endsWith){
+	public void bankAllExcept(String endsWith) {
 		bankAllExcept((e -> e.getDefinition().getName().toLowerCase().endsWith(endsWith)));
 	}
 
-	public void bankAllExcept(Predicate<SpriteItem> filter){
+	public void bankAllExcept(Predicate<SpriteItem> filter) {
 		if (Bank.isOpen()) {
 			Bank.depositAllExcept(filter);
 		} else {
@@ -39,10 +40,9 @@ public class Util {
 		}
 	}
 
-	public void drop(Predicate<SpriteItem> filter){
+	public void drop(Predicate<SpriteItem> filter) {
 		if (InterfaceWindows.getInventory().isOpen()) {
-			for (SpriteItem s : Inventory
-					.getItems(filter)) {
+			for (SpriteItem s : Inventory.getItems(filter)) {
 				if (s.interact("Drop")) {
 					Execution.delayUntil(() -> !s.isValid(), 2000, 3000);
 				}
@@ -53,15 +53,15 @@ public class Util {
 		}
 	}
 
-	public void drop(String endsWith){
+	public void drop(String endsWith) {
 		drop(spriteItem -> spriteItem.getDefinition().getName().toLowerCase().endsWith(endsWith));
 	}
 
-	public void dropAllExcept(Predicate<SpriteItem> exclusion){
+	public void dropAllExcept(Predicate<SpriteItem> exclusion) {
 		drop(exclusion.negate());
 	}
 
-	public void walkToArea(Area location){
+	public void walkToArea(Area location) {
 		BresenhamPath p = BresenhamPath.buildTo(location.getRandomCoordinate());
 		Camera.turnTo(location);
 		if (p != null) {
@@ -77,12 +77,12 @@ public class Util {
 		Execution.delayUntil(() -> !Players.getLocal().isMoving(), 4000, 6000);
 	}
 
-	public GameObject closestGameObject(String name, String action){
+	public GameObject closestGameObject(String name, String action) {
 
 		return GameObjects.newQuery().names(name).actions(action).results().nearest();
 	}
 
-	public GameObject closestGameObject(String name){
+	public GameObject closestGameObject(String name) {
 		return GameObjects.newQuery().names(name).results().nearest();
 	}
 

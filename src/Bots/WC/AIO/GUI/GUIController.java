@@ -64,12 +64,10 @@ public class GUIController implements Initializable {
 					c = new Coordinate(3094, 3516, 0);
 					break;
 			}
-
 			bot.setBankArea(new Area.Circular(c, getRadius()));
 
 			bot.setWaitingForGUI(false);
 		});
-
 	}
 
 	private int getRadius() {
