@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Runemate-Scripts.iml" filepath="$PROJECT_DIR$/Runemate-Scripts.iml" />
-      <module fileurl="file://$PROJECT_DIR$/src/Template/Template.iml" filepath="$PROJECT_DIR$/src/Template/Template.iml" />
     </modules>
   </component>
 </project>

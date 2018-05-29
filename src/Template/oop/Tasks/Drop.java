@@ -1,4 +1,4 @@
-package oop.Tasks;
+package Template.oop.Tasks;
 
 import com.runemate.game.api.hybrid.local.hud.interfaces.InterfaceWindows;
 import com.runemate.game.api.hybrid.local.hud.interfaces.Inventory;

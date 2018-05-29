@@ -1,8 +1,8 @@
-package oop;
+package Template.oop;
 
 import com.runemate.game.api.script.framework.task.TaskBot;
-import oop.Tasks.Chop;
-import oop.Tasks.Drop;
+import Template.oop.Tasks.Chop;
+import Template.oop.Tasks.Drop;
 
 public class Main extends TaskBot {
 
