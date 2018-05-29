@@ -16,22 +16,26 @@ public class Chop extends Task {
 
 	@Override
 	public boolean validate() {
-		return -1 == Players.getLocal().getAnimationId() && !Inventory.isFull() && !GameObjects.newQuery().names("Willow")
-				.results().isEmpty();
+		if (Players.getLocal().isValid()) {
+			return -1 == Players.getLocal().getAnimationId() && !Inventory.isFull() && !GameObjects.newQuery().names("Willow")
+					.results().isEmpty();
+		}
+		return false;
 	}
 
 	@Override
 	public void execute() {
 		GameObject tree = GameObjects.newQuery().names(TREE).actions(CHOP).results().nearest();
-		if(tree != null){
+		if (tree != null) {
 			Camera.turnTo(tree);
-			if(!tree.isVisible()){
+			if (!tree.isVisible()) {
 				Path p = BresenhamPath.buildTo(tree);
-				if(p != null)
+				if (p != null) {
 					p.step();
+				}
 			}
 
-		} else if(tree.interact(CHOP)){
+		} else if (tree.interact(CHOP)) {
 			Execution.delayUntil(() -> Players.getLocal().getAnimationId() != -1, 10000);
 		}
 	}
