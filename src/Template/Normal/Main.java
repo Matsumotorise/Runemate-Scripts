@@ -14,6 +14,7 @@ public class Main extends LoopingBot {
 
 	@Override
 	public void onStart(String... args){
+		System.out.println("Start");
 	}
 
 	@Override

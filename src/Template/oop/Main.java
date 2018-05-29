@@ -8,6 +8,7 @@ public class Main extends TaskBot {
 
 	@Override
 	public void onStart(String... args) {
+		System.out.println("Start OOP");
 		setLoopDelay(200, 450);
 		add(new Chop(), new Drop());
 	}
