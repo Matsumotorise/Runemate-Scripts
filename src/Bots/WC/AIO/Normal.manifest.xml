@@ -1,5 +1,5 @@
 <manifest>
-  <main-class>Template.Normal.Main</main-class>
+  <main-class>Bots.WC.AIO.Main</main-class>
   <name>State-based template</name>
   <description>Template</description>
   <version>.01</version>

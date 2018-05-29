@@ -1,4 +1,4 @@
-package Template.Normal;
+package Bots.WC.AIO;
 
 import com.runemate.game.api.script.framework.LoopingBot;
 
