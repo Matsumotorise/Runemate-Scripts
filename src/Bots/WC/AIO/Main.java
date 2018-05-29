@@ -14,6 +14,13 @@ public class Main extends LoopingBot {
 
 	@Override
 	public void onLoop() {
+		setLoopDelay(250, 401);
+
+
+		switch (getCurrentState()){
+
+		}
+
 	}
 
 	@Override
