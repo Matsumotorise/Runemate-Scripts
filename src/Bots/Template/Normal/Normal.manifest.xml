@@ -1,7 +1,7 @@
 <manifest>
   <main-class>Bots.WC.AIO.Main</main-class>
   <name>State-based template</name>
-  <description>Template</description>
+  <description>Bots.Template</description>
   <version>.01</version>
   <compatibility>
     <game-type>OSRS</game-type>
@@ -10,7 +10,7 @@
     <category>MISC</category>
   </categories>
   <!--Required to publish on the bot store-->
-  <internal-id>Template</internal-id>
+  <internal-id>Bots.Template</internal-id>
   <!--The rest are optional-->
   <hidden>false</hidden>
   <open-source>true</open-source>

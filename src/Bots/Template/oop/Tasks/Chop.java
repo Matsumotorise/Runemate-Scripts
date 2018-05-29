@@ -1,4 +1,4 @@
-package Template.oop.Tasks;
+package Bots.Template.oop.Tasks;
 
 import com.runemate.game.api.hybrid.entities.GameObject;
 import com.runemate.game.api.hybrid.local.Camera;

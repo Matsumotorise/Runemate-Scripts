@@ -1,17 +1,15 @@
 <manifest>
   <main-class>Bots.WC.AIO.Main</main-class>
-  <name>State-based template</name>
-  <description>Template</description>
+  <name>WC AIO</name>
+  <description>Testing</description>
   <version>.01</version>
   <compatibility>
     <game-type>OSRS</game-type>
   </compatibility>
   <categories>
-    <category>MISC</category>
+    <category>WOODCUTTING</category>
   </categories>
-  <!--Required to publish on the bot store-->
-  <internal-id>Template</internal-id>
-  <!--The rest are optional-->
+  <internal-id>Bots.WC.AIO.Main</internal-id>
   <hidden>false</hidden>
   <open-source>true</open-source>
 </manifest>

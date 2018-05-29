@@ -1,6 +1,6 @@
 
 <manifest>
-  <main-class>Template.oop.Main</main-class>
+  <main-class>Bots.Template.oop.Main</main-class>
   <name>OOP tempalte</name>
   <description>OOP template</description>
   <version>.01</version>
