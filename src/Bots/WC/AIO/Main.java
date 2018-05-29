@@ -20,7 +20,6 @@ public class Main extends LoopingBot {
 	private Area bankArea, chopArea;
 	private boolean dropping;
 
-	@Override
 	public void onStart(String... args) {
 		super.onStart();
 		setLoopDelay(250, 401);
@@ -41,17 +40,7 @@ public class Main extends LoopingBot {
 					return State.WALK_TO_BANK;
 				}
 			} else {
-				if (InterfaceWindows.getInventory().isOpen()) {
-					for (SpriteItem s : Inventory
-							.getItems(spriteItem -> spriteItem.getDefinition().getName().toLowerCase().endsWith("log"))) {
-						if (s.interact("Drop")) {
-							Execution.delayUntil(() -> !s.isValid(), 2000);
-						}
-					}
-				} else {
-					InterfaceWindows.getInventory().open();
-					Execution.delayUntil(() -> InterfaceWindows.getInventory().isOpen(), 500);
-				}
+				return State.DROP;
 			}
 		} else {
 			if (chopArea.contains(Players.getLocal())) {
@@ -60,7 +49,6 @@ public class Main extends LoopingBot {
 				return State.WALK_TO_CHOP;
 			}
 		}
-		return null;
 	}
 
 	private void chop() {
@@ -76,6 +64,10 @@ public class Main extends LoopingBot {
 				Execution.delayUntil(() -> Players.getLocal().getAnimationId() != -1, 11000);
 			}
 		}
+	}
+
+	private void bank() {
+
 	}
 
 	private void walkToChopArea() {
@@ -100,12 +92,18 @@ public class Main extends LoopingBot {
 		walkDelay();
 	}
 
-	private void bank() {
-
-	}
-
 	private void drop() {
-
+		if (InterfaceWindows.getInventory().isOpen()) {
+			for (SpriteItem s : Inventory
+					.getItems(spriteItem -> spriteItem.getDefinition().getName().toLowerCase().endsWith("log"))) {
+				if (s.interact("Drop")) {
+					Execution.delayUntil(() -> !s.isValid(), 2000);
+				}
+			}
+		} else {
+			InterfaceWindows.getInventory().open();
+			Execution.delayUntil(() -> InterfaceWindows.getInventory().isOpen(), 500);
+		}
 	}
 
 	private void walkDelay() {
