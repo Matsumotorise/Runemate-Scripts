@@ -25,7 +25,6 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	private String chop = "Chop down", tree = "Willow";
 	private Area.Circular bankArea, chopArea;
 	private boolean dropping, waitingForGUI = true;
-	private FXMLLoader loader;
 
 	private ObjectProperty<Node> botInterfaceProperty;
 
@@ -38,7 +37,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	@Override
 	public ObjectProperty<? extends Node> botInterfaceProperty() {
 		if (botInterfaceProperty == null) {
-			loader = new FXMLLoader();
+			FXMLLoader loader = new FXMLLoader();
 			loader.setController(new GUIController(this));
 			try {
 				Node n = loader.load(Resources.getAsStream("Bots/WC/AIO/GUI/WCController.fxml"));
@@ -50,7 +49,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 		return botInterfaceProperty;
 	}
 
-	public void onStart(String... args) {
+	public void onStart(String ... args) {
 		super.onStart();
 		setLoopDelay(250, 401);
 
@@ -60,7 +59,6 @@ public class Main extends LoopingBot implements EmbeddableUI {
 		}
 		util = new Util(this);
 		System.out.println("Starting");
-
 	}
 
 	@Override

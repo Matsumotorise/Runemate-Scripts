@@ -20,55 +20,59 @@ public class GUIController implements Initializable {
 	@FXML
 	private Button init;
 
+	@FXML
 	private TextField radius;
 
-	private ComboBox treeType, bankArea;
+	@FXML
+	private ComboBox<String> treeType, bankArea;
 
+	@FXML
 	private CheckBox drop;
-
-	private Player player;
 
 	public GUIController(Main m) {
 		bot = m;
 	}
 
-	@Override
+	@FXML
 	public void initialize(URL location, ResourceBundle resources) {
 		treeType.getItems().addAll("Tree", "Oak Tree", "Willow Tree", "Yew Tree");
 		bankArea.getItems().addAll("Lumby", "Draynor");
 		bot.setChopArea(bot.getPlayerArea(getRadius()));
 		bot.setDropping(drop.isSelected());
 
-		init.setOnAction(e -> {
-			switch (treeType.getSelectionModel().getSelectedIndex()) {
-				case 0:
-					bot.setTree("Tree");
-					break;
-				case 1:
-					bot.setTree("Oak Tree");
-					break;
-				case 2:
-					bot.setTree("Willow Tree");
-					break;
-				case 3:
-					bot.setTree("Yew Tree");
-					break;
-			}
-
-			Coordinate c = null;
-			switch (bankArea.getSelectionModel().getSelectedIndex()) {
-				case 0:
-					c = new Coordinate(3221, 3218, 0);
-					break;
-				case 1:
-					c = new Coordinate(3094, 3516, 0);
-					break;
-			}
-			bot.setBankArea(new Area.Circular(c, getRadius()));
-
-			bot.setWaitingForGUI(false);
-		});
 	}
+
+	public void initBtn(){
+		switch (treeType.getSelectionModel().getSelectedIndex()) {
+			case 0:
+				bot.setTree("Tree");
+				break;
+			case 1:
+				bot.setTree("Oak Tree");
+				break;
+			case 2:
+				bot.setTree("Willow Tree");
+				break;
+			case 3:
+				bot.setTree("Yew Tree");
+				break;
+		}
+
+		Coordinate c = null;
+		switch (bankArea.getSelectionModel().getSelectedIndex()) {
+			case 0:
+				c = new Coordinate(3221, 3218, 0);
+				break;
+			case 1:
+				c = new Coordinate(3094, 3516, 0);
+				break;
+		}
+		bot.setBankArea(new Area.Circular(c, getRadius()));
+
+		bot.setWaitingForGUI(false);
+	}
+
+
 
 	private int getRadius() {
 		try {

@@ -12,4 +12,7 @@
   <internal-id>Bots.WC.AIO.Main</internal-id>
   <hidden>false</hidden>
   <open-source>true</open-source>
+  <resources>
+    <resource>Bots/WC/AIO/GUI/WCController.fxml</resource>
+  </resources>
 </manifest>
