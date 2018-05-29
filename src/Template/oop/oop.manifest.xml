@@ -1,0 +1,18 @@
+
+<manifest>
+  <main-class>Template.oop.Main</main-class>
+  <name>OOP tempalte</name>
+  <description>OOP template</description>
+  <version>.01</version>
+  <compatibility>
+    <game-type>OSRS</game-type>
+  </compatibility>
+  <categories>
+    <category>MISC</category>
+  </categories>
+  <!--Required to publish on the bot store-->
+  <internal-id>MISC</internal-id>
+  <!--The rest are optional-->
+  <hidden>false</hidden>
+  <open-source>true</open-source>
+</manifest>
