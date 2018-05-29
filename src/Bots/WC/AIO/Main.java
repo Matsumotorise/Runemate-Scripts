@@ -72,10 +72,10 @@ public class Main extends LoopingBot {
 
 	private void walkToChopArea() {
 		BresenhamPath p = BresenhamPath.buildTo(chopArea.getRandomCoordinate());
+		Camera.turnTo(chopArea);
 		if (p != null) {
 			if (chopArea.distanceTo(Players.getLocal()) >= 8 || !ViewportPath.convert(p).step()) {  // this will attempt to walk with the viewport if the distance to the destination is < 8
 				p.step();                                                                            // if it cant walk with viewport (camera not correctly set for example), step() will return false,
-				// causing the bot to walk with the minimap
 			}
 		}
 		walkDelay();
@@ -83,10 +83,10 @@ public class Main extends LoopingBot {
 
 	private void walkToBankArea() {
 		BresenhamPath p = BresenhamPath.buildTo(bankArea.getRandomCoordinate());
+		Camera.turnTo(bankArea);
 		if (p != null) {
-			if (bankArea.distanceTo(Players.getLocal()) >= 8 || !ViewportPath.convert(p).step()) {  // this will attempt to walk with the viewport if the distance to the destination is < 8
-				p.step();                                                                            // if it cant walk with viewport (camera not correctly set for example), step() will return false,
-				// causing the bot to walk with the minimap
+			if (bankArea.distanceTo(Players.getLocal()) >= 8 || !ViewportPath.convert(p).step()) {
+				p.step();
 			}
 		}
 		walkDelay();
@@ -111,7 +111,7 @@ public class Main extends LoopingBot {
 	}
 
 	private GameObject treeSearch() {
-		GameObjects.newQuery().names(TREE).actions(CHOP).results().nearest();
+		return GameObjects.newQuery().names(TREE).actions(CHOP).results().nearest();
 	}
 
 	@Override
