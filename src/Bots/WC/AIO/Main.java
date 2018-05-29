@@ -1,17 +1,15 @@
 package Bots.WC.AIO;
 
-import Bots.WC.AIO.GUI.GUI;
+import Bots.Helper.Util;
+import Bots.WC.AIO.GUI.GUIController;
 import com.runemate.game.api.client.embeddable.EmbeddableUI;
 import com.runemate.game.api.hybrid.entities.GameObject;
 import com.runemate.game.api.hybrid.local.Camera;
-import com.runemate.game.api.hybrid.local.hud.interfaces.Bank;
-import com.runemate.game.api.hybrid.local.hud.interfaces.InterfaceWindows;
 import com.runemate.game.api.hybrid.local.hud.interfaces.Inventory;
-import com.runemate.game.api.hybrid.local.hud.interfaces.SpriteItem;
 import com.runemate.game.api.hybrid.location.Area;
+import com.runemate.game.api.hybrid.location.Area.Circular;
 import com.runemate.game.api.hybrid.location.navigation.Path;
 import com.runemate.game.api.hybrid.location.navigation.basic.BresenhamPath;
-import com.runemate.game.api.hybrid.location.navigation.basic.ViewportPath;
 import com.runemate.game.api.hybrid.region.GameObjects;
 import com.runemate.game.api.hybrid.region.Players;
 import com.runemate.game.api.hybrid.util.Resources;
@@ -25,20 +23,45 @@ import javafx.scene.Node;
 
 public class Main extends LoopingBot implements EmbeddableUI {
 
-	private final String CHOP = "Chop down", TREE = "Willow";
-	private Area bankArea, chopArea;
-	private boolean dropping;
+	private String chop = "Chop down", tree = "Willow";
+	private Area.Circular bankArea, chopArea;
+	private boolean dropping, waitingForGUI = true;
+	private FXMLLoader loader;
 
 	private ObjectProperty<Node> botInterfaceProperty;
 
-	public Main(){
+	private Util util;
+
+	public Main() {
 		setEmbeddableUI(this);
+	}
+
+	@Override
+	public ObjectProperty<? extends Node> botInterfaceProperty() {
+		if (botInterfaceProperty == null) {
+			loader = new FXMLLoader();
+			loader.setController(new GUIController(this));
+			try {
+				Node n = loader.load(Resources.getAsStream("Bots/WC/AIO/GUI/WCController.fxml"));
+				botInterfaceProperty = new SimpleObjectProperty<>(n);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return botInterfaceProperty;
 	}
 
 	public void onStart(String... args) {
 		super.onStart();
 		setLoopDelay(250, 401);
+
+		System.out.println("GUI starting");
+		while (waitingForGUI) {
+			Execution.delay(100, 200);
+		}
+		util = new Util(this);
 		System.out.println("Starting");
+
 	}
 
 	@Override
@@ -47,77 +70,38 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	}
 
 	private void chop() {
-		GameObject tree = treeSearch();
-		if (tree != null) {
-			Camera.turnTo(tree);
-			if (!tree.isVisible()) {
-				Path p = BresenhamPath.buildTo(tree);
+		GameObject t = util.closestGameObject(tree, chop);
+		if (t != null) {
+			Camera.turnTo(t);
+			if (!t.isVisible()) {
+				Path p = BresenhamPath.buildTo(t);
 				if (p != null) {
 					p.step();
 				}
-			} else if (tree.interact(CHOP)) {
+			} else if (t.interact(chop)) {
 				Execution.delayUntil(() -> Players.getLocal().getAnimationId() != -1, 11000);
 			}
 		}
 	}
 
 	private void bank() {
-		if (Bank.isOpen()) {
-			Bank.depositAllExcept(e -> e.getDefinition().getName().toLowerCase().endsWith("axe"));
-		} else {
-			Bank.open();
-			Execution.delayUntil(() -> Bank.isOpen(), 1000);
-		}
+		util.bankAllExcept("axe");
 	}
 
 	private void walkToChopArea() {
-		BresenhamPath p = BresenhamPath.buildTo(chopArea.getRandomCoordinate());
-		Camera.turnTo(chopArea);
-		if (p != null) {
-			if (chopArea.distanceTo(Players.getLocal()) >= 8 || !ViewportPath.convert(p)
-					.step()) {  // this will attempt to walk with the viewport if the distance to the destination is < 8
-				p.step();                                                                            // if it cant walk with viewport (camera not correctly set for example), step() will return false,
-			}
-		}
-		walkDelay();
+		util.walkToArea(chopArea);
 	}
 
 	private void walkToBankArea() {
-		BresenhamPath p = BresenhamPath.buildTo(bankArea.getRandomCoordinate());
-		Camera.turnTo(bankArea);
-		if (p != null) {
-			if (bankArea.distanceTo(Players.getLocal()) >= 8 || !ViewportPath.convert(p).step()) {
-				p.step();
-			}
-		}
-		walkDelay();
+		util.walkToArea(bankArea);
 	}
 
 	private void drop() {
-		if (InterfaceWindows.getInventory().isOpen()) {
-			for (SpriteItem s : Inventory
-					.getItems(spriteItem -> spriteItem.getDefinition().getName().toLowerCase().endsWith("log"))) {
-				if (s.interact("Drop")) {
-					Execution.delayUntil(() -> !s.isValid(), 2000, 3000);
-				}
-			}
-		} else {
-			InterfaceWindows.getInventory().open();
-			Execution.delayUntil(() -> InterfaceWindows.getInventory().isOpen(), 500);
-		}
-	}
-
-	private void walkDelay() {
-		Execution.delayUntil(() -> !Players.getLocal().isMoving(), 4000, 6000);
-	}
-
-	private GameObject treeSearch() {
-		return GameObjects.newQuery().names(TREE).actions(CHOP).results().nearest();
+		util.drop("log");
 	}
 
 	@Override
 	public void onLoop() {
-
 		switch (getCurrentState()) {
 			case CHOP:
 				chop();
@@ -157,19 +141,28 @@ public class Main extends LoopingBot implements EmbeddableUI {
 		}
 	}
 
-	@Override
-	public ObjectProperty<? extends Node> botInterfaceProperty() {
-		if(botInterfaceProperty == null){
-			FXMLLoader loader = new FXMLLoader();
-			loader.setController(new GUI());
-			try {
-				Node n = loader.load(Resources.getAsStream("Bots/WC/AIO/GUI/GUI.fxml"));
-				botInterfaceProperty = new SimpleObjectProperty<>(n);
-			} catch (IOException e){
-				e.printStackTrace();
-			}
-		}
-		return botInterfaceProperty;
+	public void setBankArea(Area.Circular bankArea) {
+		this.bankArea = bankArea;
+	}
+
+	public void setChopArea(Area.Circular chopArea) {
+		this.chopArea = chopArea;
+	}
+
+	public void setDropping(boolean dropping) {
+		this.dropping = dropping;
+	}
+
+	public Circular getPlayerArea(int rad) {
+		return new Circular(Players.getLocal().getPosition(), rad);
+	}
+
+	public void setTree(String tree) {
+		this.tree = tree;
+	}
+
+	public void setWaitingForGUI(boolean waitingForGUI) {
+		this.waitingForGUI = waitingForGUI;
 	}
 
 	private enum State {
