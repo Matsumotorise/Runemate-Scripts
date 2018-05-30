@@ -36,8 +36,8 @@
     <Label GridPane.rowIndex="6" text="Tree"/>
     <ComboBox GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" prefHeight="31.0" prefWidth="724.0" fx:id="treeType"/>
     <CheckBox GridPane.rowIndex="8" mnemonicParsing="false" text="Drop?" fx:id="drop"/>
-    <Button GridPane.hgrow="ALWAYS" GridPane.rowIndex="9" alignment="CENTER" mnemonicParsing="false" prefHeight="31.0"
-      prefWidth="720.0"
-      text="Start" fx:id="init" onAction="#initBtn"/>
+    <Button GridPane.hgrow="ALWAYS" GridPane.rowIndex="9" alignment="CENTER" mnemonicParsing="false" onAction="#initBtn"
+      prefHeight="31.0"
+      prefWidth="720.0" text="Start" fx:id="init"/>
   </children>
 </GridPane>

@@ -23,11 +23,10 @@ import javafx.scene.Node;
 
 public class Main extends LoopingBot implements EmbeddableUI {
 
+	private GUIController controller;
 	private String chop, tree;
 	private Area.Circular bankArea, chopArea;
 	private boolean dropping;
-	GUIController controller;
-
 	private ObjectProperty<Node> botInterfaceProperty;
 
 	private Util util;
@@ -54,7 +53,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 		return botInterfaceProperty;
 	}
 
-	public void onStart(String ... args) {
+	public void onStart(String... args) {
 		super.onStart();
 
 		OSRS.LOGIN_HANDLER.disable();
@@ -67,7 +66,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 				Execution.delay(100, 200);
 				System.out.println("Waiting for information");
 			}
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println("Starting");
@@ -81,8 +80,6 @@ public class Main extends LoopingBot implements EmbeddableUI {
 		System.out.println(bankArea);
 		System.out.println(dropping);
 		System.out.println(tree);
-
-
 	}
 
 	@Override
@@ -100,6 +97,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 					p.step();
 				}
 			} else if (t.interact(chop)) {
+				Execution.delayUntil(() -> Players.getLocal().getAnimationId() != -1, 20000);
 				Execution.delayUntil(() -> Players.getLocal().getAnimationId() == -1, 20000);
 			}
 		}
@@ -171,7 +169,6 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	private Circular getPlayerArea(int rad) {
 		return new Circular(Players.getLocal().getPosition(), rad);
 	}
-
 
 	private enum State {
 		CHOP, WALK_TO_CHOP, BANK, WALK_TO_BANK, DROP

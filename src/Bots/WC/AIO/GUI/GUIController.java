@@ -1,6 +1,5 @@
 package Bots.WC.AIO.GUI;
 
-import Bots.WC.AIO.Main;
 import com.runemate.game.api.hybrid.location.Area;
 import com.runemate.game.api.hybrid.location.Area.Circular;
 import com.runemate.game.api.hybrid.location.Coordinate;
@@ -34,7 +33,6 @@ public class GUIController implements Initializable {
 	private Area.Circular bankA;
 
 
-
 	public GUIController() {
 	}
 
@@ -45,7 +43,7 @@ public class GUIController implements Initializable {
 		waitingForGUI = true;
 	}
 
-	public void initBtn(){
+	public void initBtn() {
 		rad = getRadius();
 
 		switch (treeType.getSelectionModel().getSelectedIndex()) {
@@ -66,7 +64,7 @@ public class GUIController implements Initializable {
 		Coordinate c = null;
 		switch (bankArea.getSelectionModel().getSelectedIndex()) {
 			case 0:
-				c = new Coordinate(3221, 3218, 0);
+				c = new Coordinate(3208, 3220, 2);
 				break;
 			case 1:
 				c = new Coordinate(3094, 3516, 0);
