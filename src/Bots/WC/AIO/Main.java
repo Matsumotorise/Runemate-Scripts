@@ -8,7 +8,6 @@ import com.runemate.game.api.hybrid.entities.GameObject;
 import com.runemate.game.api.hybrid.local.Camera;
 import com.runemate.game.api.hybrid.local.hud.interfaces.Inventory;
 import com.runemate.game.api.hybrid.location.Area;
-import com.runemate.game.api.hybrid.location.Area.Circular;
 import com.runemate.game.api.hybrid.location.navigation.Path;
 import com.runemate.game.api.hybrid.location.navigation.basic.BresenhamPath;
 import com.runemate.game.api.hybrid.region.Players;
@@ -41,7 +40,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	public ObjectProperty<? extends Node> botInterfaceProperty() {
 		if (botInterfaceProperty == null) {
 			FXMLLoader loader = new FXMLLoader();
-			controller = new GUIController();
+			controller = new GUIController(util);
 			loader.setController(controller);
 			try {
 				Node n = loader.load(Resources.getAsStream("Bots/WC/AIO/GUI/WCController.fxml"));
@@ -55,15 +54,15 @@ public class Main extends LoopingBot implements EmbeddableUI {
 
 	public void onStart(String... args) {
 		super.onStart();
-
 		OSRS.LOGIN_HANDLER.disable();
-		setLoopDelay(250, 401);
-		System.out.println("GUI starting");
 		util = new Util(this);
+		setLoopDelay(250, 401);
+
+		System.out.println("GUI starting");
 		try {
 			Execution.delay(1000);
 			while (controller.isWaitingForGUI()) {
-				Execution.delay(100, 200);
+				Execution.delay(400, 500);
 				System.out.println("Waiting for information");
 			}
 		} catch (Exception e) {
@@ -71,7 +70,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 		}
 		System.out.println("Starting");
 
-		chopArea = getPlayerArea(controller.getRad());
+		chopArea = util.generateAreaAroundEntity(Players.getLocal(), controller.getRad());
 		bankArea = controller.getBankA();
 		dropping = controller.isDropping();
 		tree = controller.getTree();
@@ -108,11 +107,11 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	}
 
 	private void walkToChopArea() {
-		util.walkToArea(chopArea);
+		util.walkWithViewPort(chopArea);
 	}
 
 	private void walkToBankArea() {
-		util.walkToArea(bankArea);
+		util.walkWithViewPort(bankArea);
 	}
 
 	private void drop() {
@@ -164,10 +163,6 @@ public class Main extends LoopingBot implements EmbeddableUI {
 				return State.WALK_TO_CHOP;
 			}
 		}
-	}
-
-	private Circular getPlayerArea(int rad) {
-		return new Circular(Players.getLocal().getPosition(), rad);
 	}
 
 	private enum State {

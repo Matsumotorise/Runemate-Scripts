@@ -1,12 +1,15 @@
 package Bots.Helper;
 
 import com.runemate.game.api.hybrid.entities.GameObject;
+import com.runemate.game.api.hybrid.entities.LocatableEntity;
 import com.runemate.game.api.hybrid.local.Camera;
 import com.runemate.game.api.hybrid.local.hud.interfaces.Bank;
 import com.runemate.game.api.hybrid.local.hud.interfaces.InterfaceWindows;
 import com.runemate.game.api.hybrid.local.hud.interfaces.Inventory;
 import com.runemate.game.api.hybrid.local.hud.interfaces.SpriteItem;
 import com.runemate.game.api.hybrid.location.Area;
+import com.runemate.game.api.hybrid.location.Area.Circular;
+import com.runemate.game.api.hybrid.location.Coordinate;
 import com.runemate.game.api.hybrid.location.navigation.basic.BresenhamPath;
 import com.runemate.game.api.hybrid.location.navigation.basic.ViewportPath;
 import com.runemate.game.api.hybrid.region.GameObjects;
@@ -40,6 +43,15 @@ public class Util {
 		}
 	}
 
+	public void withdraw(Predicate<SpriteItem> filter, int amt) {
+		if (Bank.isOpen()) {
+			Bank.withdraw(filter, amt);
+		} else {
+			Bank.open();
+			Execution.delayUntil(() -> Bank.isOpen(), 1000);
+		}
+	}
+
 	public void drop(Predicate<SpriteItem> filter) {
 		if (InterfaceWindows.getInventory().isOpen()) {
 			for (SpriteItem s : Inventory.getItems(filter)) {
@@ -61,7 +73,7 @@ public class Util {
 		drop(exclusion.negate());
 	}
 
-	public void walkToArea(Area location) {
+	public void walkWithViewPort(Area location) {
 		BresenhamPath p = BresenhamPath.buildTo(location.getRandomCoordinate());
 		Camera.turnTo(location);
 		if (p != null) {
@@ -78,7 +90,6 @@ public class Util {
 	}
 
 	public GameObject closestGameObject(String name, String action) {
-
 		return GameObjects.newQuery().names(name).actions(action).results().nearest();
 	}
 
@@ -86,4 +97,11 @@ public class Util {
 		return GameObjects.newQuery().names(name).results().nearest();
 	}
 
+	public Area.Circular generateAreaAroundEntity(LocatableEntity e, int radius) {
+		return generateArea(e.getPosition(), radius);
+	}
+
+	public Area.Circular generateArea(Coordinate c, int radius) {
+		return new Circular(c, radius);
+	}
 }
