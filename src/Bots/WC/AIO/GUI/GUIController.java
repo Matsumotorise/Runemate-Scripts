@@ -75,7 +75,7 @@ public class GUIController implements Initializable {
 				break;
 		}
 
-		bankA = util.generateArea(c, rad);
+		bankA = util.generateArea(c, 2);
 
 		dropping = drop.isSelected();
 

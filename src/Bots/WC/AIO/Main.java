@@ -111,7 +111,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	}
 
 	private void walkToBankArea() {
-		util.walkWithViewPort(bankArea);
+		util.walkWithViewPort(bankArea.getRandomCoordinate());
 	}
 
 	private void drop() {

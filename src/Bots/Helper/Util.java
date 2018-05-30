@@ -85,6 +85,19 @@ public class Util {
 		walkDelay();
 	}
 
+	public void walkWithViewPort(Coordinate location) {
+		BresenhamPath p = BresenhamPath.buildTo(location);
+		Camera.turnTo(location);
+		if (p != null) {
+			if (location.distanceTo(Players.getLocal()) >= 8 || !ViewportPath.convert(p)
+					.step()) {  // this will attempt to walk with the viewport if the distance to the destination is < 8
+				p.step();                                                                            // if it cant walk with viewport (camera not correctly set for example), step() will return false,
+			}
+		}
+		walkDelay();
+
+	}
+
 	private void walkDelay() {
 		Execution.delayUntil(() -> !Players.getLocal().isMoving(), 4000, 6000);
 	}
