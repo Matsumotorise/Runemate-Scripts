@@ -3,6 +3,7 @@ package Bots.WC.AIO;
 import Bots.Helper.Util;
 import Bots.WC.AIO.GUI.GUIController;
 import com.runemate.game.api.client.embeddable.EmbeddableUI;
+import com.runemate.game.api.hybrid.GameEvents.OSRS;
 import com.runemate.game.api.hybrid.entities.GameObject;
 import com.runemate.game.api.hybrid.local.Camera;
 import com.runemate.game.api.hybrid.local.hud.interfaces.Inventory;
@@ -22,15 +23,18 @@ import javafx.scene.Node;
 
 public class Main extends LoopingBot implements EmbeddableUI {
 
-	private String chop = "Chop down", tree = "Willow";
+	private String chop, tree;
 	private Area.Circular bankArea, chopArea;
-	private boolean dropping, waitingForGUI = true;
+	private boolean dropping;
+	GUIController controller;
 
 	private ObjectProperty<Node> botInterfaceProperty;
 
 	private Util util;
 
 	public Main() {
+		chop = "Chop down";
+		tree = "Tree";
 		setEmbeddableUI(this);
 	}
 
@@ -38,7 +42,8 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	public ObjectProperty<? extends Node> botInterfaceProperty() {
 		if (botInterfaceProperty == null) {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setController(new GUIController(this));
+			controller = new GUIController();
+			loader.setController(controller);
 			try {
 				Node n = loader.load(Resources.getAsStream("Bots/WC/AIO/GUI/WCController.fxml"));
 				botInterfaceProperty = new SimpleObjectProperty<>(n);
@@ -51,14 +56,33 @@ public class Main extends LoopingBot implements EmbeddableUI {
 
 	public void onStart(String ... args) {
 		super.onStart();
-		setLoopDelay(250, 401);
 
+		OSRS.LOGIN_HANDLER.disable();
+		setLoopDelay(250, 401);
 		System.out.println("GUI starting");
-		while (waitingForGUI) {
-			Execution.delay(100, 200);
-		}
 		util = new Util(this);
+		try {
+			Execution.delay(1000);
+			while (controller.isWaitingForGUI()) {
+				Execution.delay(100, 200);
+				System.out.println("Waiting for information");
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 		System.out.println("Starting");
+
+		chopArea = getPlayerArea(controller.getRad());
+		bankArea = controller.getBankA();
+		dropping = controller.isDropping();
+		tree = controller.getTree();
+
+		System.out.println(chopArea);
+		System.out.println(bankArea);
+		System.out.println(dropping);
+		System.out.println(tree);
+
+
 	}
 
 	@Override
@@ -76,7 +100,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 					p.step();
 				}
 			} else if (t.interact(chop)) {
-				Execution.delayUntil(() -> Players.getLocal().getAnimationId() != -1, 11000);
+				Execution.delayUntil(() -> Players.getLocal().getAnimationId() == -1, 20000);
 			}
 		}
 	}
@@ -99,6 +123,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 
 	@Override
 	public void onLoop() {
+		System.out.println("Looping");
 		switch (getCurrentState()) {
 			case CHOP:
 				chop();
@@ -122,45 +147,31 @@ public class Main extends LoopingBot implements EmbeddableUI {
 		if (Inventory.isFull()) {
 			if (!dropping) {
 				if (bankArea.contains(Players.getLocal())) {
+					System.out.println("Banking");
 					return State.BANK;
 				} else {
+					System.out.println("Walking to bank");
 					return State.WALK_TO_BANK;
 				}
 			} else {
+				System.out.println("Dropping");
 				return State.DROP;
 			}
 		} else {
 			if (chopArea.contains(Players.getLocal())) {
+				System.out.println("Choppin");
 				return State.CHOP;
 			} else {
+				System.out.println("Walking to woods");
 				return State.WALK_TO_CHOP;
 			}
 		}
 	}
 
-	public void setBankArea(Area.Circular bankArea) {
-		this.bankArea = bankArea;
-	}
-
-	public void setChopArea(Area.Circular chopArea) {
-		this.chopArea = chopArea;
-	}
-
-	public void setDropping(boolean dropping) {
-		this.dropping = dropping;
-	}
-
-	public Circular getPlayerArea(int rad) {
+	private Circular getPlayerArea(int rad) {
 		return new Circular(Players.getLocal().getPosition(), rad);
 	}
 
-	public void setTree(String tree) {
-		this.tree = tree;
-	}
-
-	public void setWaitingForGUI(boolean waitingForGUI) {
-		this.waitingForGUI = waitingForGUI;
-	}
 
 	private enum State {
 		CHOP, WALK_TO_CHOP, BANK, WALK_TO_BANK, DROP

@@ -1,8 +1,8 @@
 package Bots.WC.AIO.GUI;
 
 import Bots.WC.AIO.Main;
-import com.runemate.game.api.hybrid.entities.Player;
 import com.runemate.game.api.hybrid.location.Area;
+import com.runemate.game.api.hybrid.location.Area.Circular;
 import com.runemate.game.api.hybrid.location.Coordinate;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -15,46 +15,51 @@ import javafx.scene.control.TextField;
 
 public class GUIController implements Initializable {
 
-	private Main bot;
+	@FXML
+	public Button init;
 
 	@FXML
-	private Button init;
+	public TextField radius;
 
 	@FXML
-	private TextField radius;
+	public ComboBox<String> treeType, bankArea;
 
 	@FXML
-	private ComboBox<String> treeType, bankArea;
+	public CheckBox drop;
 
-	@FXML
-	private CheckBox drop;
 
-	public GUIController(Main m) {
-		bot = m;
+	private int rad;
+	private String tree;
+	private boolean dropping, waitingForGUI;
+	private Area.Circular bankA;
+
+
+
+	public GUIController() {
 	}
 
-	@FXML
+	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		treeType.getItems().addAll("Tree", "Oak Tree", "Willow Tree", "Yew Tree");
 		bankArea.getItems().addAll("Lumby", "Draynor");
-		bot.setChopArea(bot.getPlayerArea(getRadius()));
-		bot.setDropping(drop.isSelected());
-
+		waitingForGUI = true;
 	}
 
 	public void initBtn(){
+		rad = getRadius();
+
 		switch (treeType.getSelectionModel().getSelectedIndex()) {
 			case 0:
-				bot.setTree("Tree");
+				tree = "Tree";
 				break;
 			case 1:
-				bot.setTree("Oak Tree");
+				tree = "Oak Tree";
 				break;
 			case 2:
-				bot.setTree("Willow Tree");
+				tree = "Willow Tree";
 				break;
 			case 3:
-				bot.setTree("Yew Tree");
+				tree = "Yew Tree";
 				break;
 		}
 
@@ -67,12 +72,13 @@ public class GUIController implements Initializable {
 				c = new Coordinate(3094, 3516, 0);
 				break;
 		}
-		bot.setBankArea(new Area.Circular(c, getRadius()));
 
-		bot.setWaitingForGUI(false);
+		bankA = new Area.Circular(c, rad);
+
+		dropping = drop.isSelected();
+
+		waitingForGUI = false;
 	}
-
-
 
 	private int getRadius() {
 		try {
@@ -82,5 +88,26 @@ public class GUIController implements Initializable {
 		}
 		return 10;
 	}
+
+	public int getRad() {
+		return rad;
+	}
+
+	public String getTree() {
+		return tree;
+	}
+
+	public boolean isDropping() {
+		return dropping;
+	}
+
+	public boolean isWaitingForGUI() {
+		return waitingForGUI;
+	}
+
+	public Circular getBankA() {
+		return bankA;
+	}
 }
+
 
