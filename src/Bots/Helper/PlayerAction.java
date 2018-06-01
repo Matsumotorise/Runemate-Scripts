@@ -32,8 +32,10 @@ public class PlayerAction {
 		} else {
 			i = util.getClosestNPC("Banker", "Bank");
 		}
-		i.interact("Bank");
-		Execution.delayUntil(() -> Bank.isOpen(), 3000);
+		if (i != null && i.isVisible()) {
+			i.interact("Bank");
+		}
+		Execution.delayUntil(() -> Bank.isOpen(), 2000);
 	}
 
 	public void bank(Predicate<SpriteItem> filter) {

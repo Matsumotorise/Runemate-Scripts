@@ -69,17 +69,14 @@ public class GUIController implements Initializable {
 				break;
 		}
 
-		Coordinate c = null;
 		switch (bankArea.getSelectionModel().getSelectedIndex()) {
 			case 0:
-				c = Location.LUMBRIDGE_BANK.getCoordinate();
+				bankA = (Area.Circular) Location.LUMBRIDGE_BANK.getArea();
 				break;
 			case 1:
-				c = Location.DRAYNOR_BANK.getCoordinate();
+				bankA = (Area.Circular) Location.DRAYNOR_BANK.getArea();
 				break;
 		}
-
-		bankA = util.generateArea(c, 3);
 
 		dropping = drop.isSelected();
 
