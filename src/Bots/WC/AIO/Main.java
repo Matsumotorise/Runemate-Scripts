@@ -3,18 +3,15 @@ package Bots.WC.AIO;
 import Bots.Helper.Util;
 import Bots.WC.AIO.GUI.GUIController;
 import com.runemate.game.api.client.embeddable.EmbeddableUI;
-import com.runemate.game.api.hybrid.GameEvents.OSRS;
 import com.runemate.game.api.hybrid.entities.GameObject;
 import com.runemate.game.api.hybrid.local.Camera;
 import com.runemate.game.api.hybrid.local.hud.interfaces.Inventory;
 import com.runemate.game.api.hybrid.location.Area;
 import com.runemate.game.api.hybrid.location.navigation.Path;
-import com.runemate.game.api.hybrid.location.navigation.basic.BresenhamPath;
+import com.runemate.game.api.hybrid.location.navigation.cognizant.RegionPath;
 import com.runemate.game.api.hybrid.region.Players;
 import com.runemate.game.api.hybrid.util.Resources;
 import com.runemate.game.api.script.Execution;
-import com.runemate.game.api.script.framework.AbstractBot;
-import com.runemate.game.api.script.framework.AbstractBot.State;
 import com.runemate.game.api.script.framework.LoopingBot;
 import java.io.IOException;
 import javafx.beans.property.ObjectProperty;
@@ -26,6 +23,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 
 	private boolean dropping;
 	private String chop, tree;
+	private long loopNum;
 
 	private GUIController controller;
 	private Area.Circular bankArea, chopArea;
@@ -35,6 +33,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	public Main() {
 		chop = "Chop down";
 		tree = "Tree";
+		loopNum = 0;
 		setEmbeddableUI(this);
 	}
 
@@ -56,17 +55,16 @@ public class Main extends LoopingBot implements EmbeddableUI {
 
 	public void onStart(String... args) {
 		super.onStart();
-		OSRS.LOGIN_HANDLER.disable();
+		//OSRS.LOGIN_HANDLER.disable();
 		util = new Util(this);
 		setLoopDelay(250, 401);
-
 		System.out.println("GUI starting");
 		try {
-			Execution.delay(1000);
-			while (controller.isWaitingForGUI()) {
-				Execution.delay(400, 500);
+			Execution.delayUntil(() -> {
 				System.out.println("Waiting for information");
-			}
+				Execution.delay(2000);
+				return !controller.isWaitingForGUI();
+			}, 1200000, 1290000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -107,25 +105,35 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	}
 
 	private void chop() {
-		GameObject t = util.closestGameObject(tree, chop);
+		if (Players.getLocal().getAnimationId() == 879) {
+			chopWait();
+		}
+
+		GameObject t = util.getClosestGameObject(tree, chop);
 		if (t != null) {
+			if (Math.random() < .25) {
+				Camera.turnTo(t);
+			}
 			if (!t.isVisible()) {
-				//TODO fix path to make roundabout path
-				Path p = BresenhamPath.buildTo(t);
+				Path p = RegionPath.buildTo(t);
 				if (p != null) {
 					p.step();
-					if (Math.random() < .25) {
-						Camera.turnTo(t);
-					}
 				}
 			} else if (!Players.getLocal().isMoving() && Players.getLocal().getAnimationId() != 879 && t.isValid()) {
+				System.out.println("Choppin");
 				t.interact(chop);
-				Execution.delayUntil(() -> Players.getLocal().isMoving(), 1800);
-				Execution.delayUntil(() -> Players.getLocal().getAnimationId() == 879, 1800);
-				Execution.delayUntil(() -> Players.getLocal().getAnimationId() == -1, controller.getMaxDelayUntilTreeDies());
+				chopWait();
 			}
 		}
 	}
+
+	private void chopWait() {
+		Execution.delayUntil(() -> Players.getLocal().isMoving() || util.getplayerAction().isTargeted(), 1800);
+		Execution.delayUntil(() -> Players.getLocal().getAnimationId() == 879 || util.getplayerAction().isTargeted(), 1800);
+		Execution.delayUntil(() -> Players.getLocal().getAnimationId() == -1 || util.getplayerAction().isTargeted(),
+				controller.getMaxDelayUntilTreeDies());
+	}
+
 	private void walkToBankArea() {
 		util.getplayerAction().walkWithViewPort(bankArea.getRandomCoordinate());
 	}
@@ -134,13 +142,15 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	private void bank() {
 		util.getplayerAction().bankAllExcept("axe");
 	}
+
 	private void drop() {
 		util.getplayerAction().drop("log");
 	}
 
 	@Override
 	public void onLoop() {
-		System.out.println("Looping");
+		loopNum++;
+		System.out.println("Loop Number: " + loopNum);
 		switch (getCurrentState()) {
 			case CHOP:
 				chop();
@@ -161,7 +171,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	}
 
 	private State getCurrentState() {
-		if (Inventory.isFull()) {
+		if (Inventory.isFull() || util.getplayerAction().isTargeted()) {
 			if (!dropping) {
 				if (bankArea.contains(Players.getLocal())) {
 					System.out.println("Banking");
@@ -176,7 +186,6 @@ public class Main extends LoopingBot implements EmbeddableUI {
 			}
 		} else {
 			if (chopArea.contains(Players.getLocal())) {
-				System.out.println("Choppin");
 				return State.CHOP;
 			} else {
 				System.out.println("Walking to woods");

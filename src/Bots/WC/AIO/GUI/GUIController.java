@@ -56,15 +56,15 @@ public class GUIController implements Initializable {
 				maxDelayUntilTreeDies = 30000;
 				break;
 			case 1:
-				tree = "Oak Tree";
+				tree = "Oak";
 				maxDelayUntilTreeDies = 40000;
 				break;
 			case 2:
-				tree = "Willow Tree";
+				tree = "Willow";
 				maxDelayUntilTreeDies = 50000;
 				break;
 			case 3:
-				tree = "Yew Tree";
+				tree = "Yew";
 				maxDelayUntilTreeDies = 60000;
 				break;
 		}
@@ -79,7 +79,7 @@ public class GUIController implements Initializable {
 				break;
 		}
 
-		bankA = util.generateArea(c, 2);
+		bankA = util.generateArea(c, 3);
 
 		dropping = drop.isSelected();
 
