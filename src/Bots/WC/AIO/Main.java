@@ -13,6 +13,8 @@ import com.runemate.game.api.hybrid.location.navigation.basic.BresenhamPath;
 import com.runemate.game.api.hybrid.region.Players;
 import com.runemate.game.api.hybrid.util.Resources;
 import com.runemate.game.api.script.Execution;
+import com.runemate.game.api.script.framework.AbstractBot;
+import com.runemate.game.api.script.framework.AbstractBot.State;
 import com.runemate.game.api.script.framework.LoopingBot;
 import java.io.IOException;
 import javafx.beans.property.ObjectProperty;
@@ -22,12 +24,12 @@ import javafx.scene.Node;
 
 public class Main extends LoopingBot implements EmbeddableUI {
 
-	private GUIController controller;
-	private String chop, tree;
-	private Area.Circular bankArea, chopArea;
 	private boolean dropping;
-	private ObjectProperty<Node> botInterfaceProperty;
+	private String chop, tree;
 
+	private GUIController controller;
+	private Area.Circular bankArea, chopArea;
+	private ObjectProperty<Node> botInterfaceProperty;
 	private Util util;
 
 	public Main() {
@@ -74,48 +76,66 @@ public class Main extends LoopingBot implements EmbeddableUI {
 		bankArea = controller.getBankA();
 		dropping = controller.isDropping();
 		tree = controller.getTree();
-
+		System.out.println("/////////Variable details//////////");
 		System.out.println(chopArea);
 		System.out.println(bankArea);
 		System.out.println(dropping);
 		System.out.println(tree);
+		System.out.println("/////////Variable details//////////");
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
+		System.out.println("/////////////////Stopping////////////////////");
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		System.out.println("///////////////////Pausing////////////////////");
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		System.out.println("////////////Resuming////////////");
+	}
+
+	private void walkToChopArea() {
+		util.getplayerAction().walkWithViewPort(chopArea);
 	}
 
 	private void chop() {
 		GameObject t = util.closestGameObject(tree, chop);
 		if (t != null) {
-			Camera.turnTo(t);
 			if (!t.isVisible()) {
+				//TODO fix path to make roundabout path
 				Path p = BresenhamPath.buildTo(t);
 				if (p != null) {
 					p.step();
+					if (Math.random() < .25) {
+						Camera.turnTo(t);
+					}
 				}
-			} else if (t.interact(chop)) {
-				Execution.delayUntil(() -> Players.getLocal().getAnimationId() != -1, 20000);
-				Execution.delayUntil(() -> Players.getLocal().getAnimationId() == -1, 20000);
+			} else if (!Players.getLocal().isMoving() && Players.getLocal().getAnimationId() != 879 && t.isValid()) {
+				t.interact(chop);
+				Execution.delayUntil(() -> Players.getLocal().isMoving(), 1800);
+				Execution.delayUntil(() -> Players.getLocal().getAnimationId() == 879, 1800);
+				Execution.delayUntil(() -> Players.getLocal().getAnimationId() == -1, controller.getMaxDelayUntilTreeDies());
 			}
 		}
 	}
-
-	private void bank() {
-		util.bankAllExcept("axe");
-	}
-
-	private void walkToChopArea() {
-		util.walkWithViewPort(chopArea);
-	}
-
 	private void walkToBankArea() {
-		util.walkWithViewPort(bankArea.getRandomCoordinate());
+		util.getplayerAction().walkWithViewPort(bankArea.getRandomCoordinate());
 	}
 
+	//TODO fix banking
+	private void bank() {
+		util.getplayerAction().bankAllExcept("axe");
+	}
 	private void drop() {
-		util.drop("log");
+		util.getplayerAction().drop("log");
 	}
 
 	@Override

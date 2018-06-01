@@ -29,7 +29,7 @@ public class GUIController implements Initializable {
 	public CheckBox drop;
 
 
-	private int rad;
+	private int rad, maxDelayUntilTreeDies;
 	private String tree;
 	private boolean dropping, waitingForGUI;
 	private Area.Circular bankA;
@@ -53,15 +53,19 @@ public class GUIController implements Initializable {
 		switch (treeType.getSelectionModel().getSelectedIndex()) {
 			case 0:
 				tree = "Tree";
+				maxDelayUntilTreeDies = 30000;
 				break;
 			case 1:
 				tree = "Oak Tree";
+				maxDelayUntilTreeDies = 40000;
 				break;
 			case 2:
 				tree = "Willow Tree";
+				maxDelayUntilTreeDies = 50000;
 				break;
 			case 3:
 				tree = "Yew Tree";
+				maxDelayUntilTreeDies = 60000;
 				break;
 		}
 
@@ -109,6 +113,10 @@ public class GUIController implements Initializable {
 
 	public Circular getBankA() {
 		return bankA;
+	}
+
+	public int getMaxDelayUntilTreeDies() {
+		return maxDelayUntilTreeDies;
 	}
 }
 
