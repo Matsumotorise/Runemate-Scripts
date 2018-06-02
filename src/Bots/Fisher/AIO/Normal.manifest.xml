@@ -1,0 +1,18 @@
+<manifest>
+  <main-class>Bots.Fisher.AIO.Main</main-class>
+  <name>Fisher AIO</name>
+  <description>Testing</description>
+  <version>.01</version>
+  <compatibility>
+    <game-type>OSRS</game-type>
+  </compatibility>
+  <categories>
+    <category>FISHING</category>
+  </categories>
+  <internal-id>Bots.WC.AIO.Main</internal-id>
+  <hidden>false</hidden>
+  <open-source>true</open-source>
+  <resources>
+    <resource>Bots/WC/AIO/GUI/WCController.fxml</resource>
+  </resources>
+</manifest>
