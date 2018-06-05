@@ -2,7 +2,7 @@ package Bots.Fisher.AIO.GUI;
 
 import Bots.Helper.Location;
 import Bots.Helper.Util;
-import com.runemate.game.api.hybrid.location.Area.Circular;
+import com.runemate.game.api.hybrid.location.Area;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -21,39 +21,62 @@ public class GUIController implements Initializable {
 	public TextField radius;
 
 	@FXML
-	public ComboBox<String> treeType, bankArea;
+	public ComboBox<String> fishUtilField, bankArea;
 
 	@FXML
 	public CheckBox drop;
 
 	private int rad, maxDelayUntilTreeDies;
-	private String fishHole;
-	private String[] fishHoles;
+	private String[] fishUtils;
+	private String fishUtil, fishHoleAction, bait;
 	private boolean dropping, waitingForGUI;
-	private Circular bankA;
-	private Util util;
+	private Area bankA;
 
-	public GUIController(Util util) {
-		this.util = util;
+	public GUIController() {
+
 	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		fishHoles = new String[]{"net", "bait"};
-		treeType.getItems().addAll(fishHoles);
+		bait = "";
+		fishUtils = new String[]{"Small Net", "Fishing rod", "Fly fishing rod", "Harpoon", "Lobster pot"};
+		fishUtilField.getItems().addAll(fishUtils);
 		bankArea.getItems().addAll("Lumby", "Draynor");
 		waitingForGUI = true;
 	}
 
 	public void initBtn() {
 		rad = getRadius();
-		fishHole = treeType.getSelectionModel().getSelectedItem();
-		switch (bankArea.getSelectionModel().getSelectedIndex()) {
+		fishUtil = fishUtilField.getSelectionModel().getSelectedItem();
+
+		int i = fishUtilField.getSelectionModel().getSelectedIndex();
+		switch (i) {
 			case 0:
-				bankA = (Circular) Location.LUMBRIDGE_BANK.getArea();
+				fishHoleAction = "Small net";
 				break;
 			case 1:
-				bankA = (Circular) Location.DRAYNOR_BANK.getArea();
+				fishHoleAction = "Bait";
+				bait = "fishing bait";
+				break;
+			case 2:
+				fishHoleAction = "Lure";
+				bait = "Feathers";
+				break;
+			case 3:
+				fishHoleAction = "Harpoon";
+				break;
+			case 4:
+				fishHoleAction = "Cage";
+				break;
+		}
+
+		i = bankArea.getSelectionModel().getSelectedIndex();
+		switch (i) {
+			case 0:
+				bankA = Location.LUMBRIDGE_BANK.getArea();
+				break;
+			case 1:
+				bankA = Location.DRAYNOR_BANK.getArea();
 				break;
 		}
 		dropping = drop.isSelected();
@@ -74,8 +97,12 @@ public class GUIController implements Initializable {
 		return rad;
 	}
 
-	public String getFishHoleName() {
-		return fishHole;
+	public String getFishHoleAction() {
+		return fishHoleAction;
+	}
+
+	public String getFishUtil() {
+		return fishUtil;
 	}
 
 	public boolean isDropping() {
@@ -86,12 +113,16 @@ public class GUIController implements Initializable {
 		return waitingForGUI;
 	}
 
-	public Circular getBankA() {
+	public Area getBankA() {
 		return bankA;
 	}
 
 	public int getMaxDelayUntilTreeDies() {
 		return maxDelayUntilTreeDies;
+	}
+
+	public String getBait() {
+		return bait;
 	}
 }
 

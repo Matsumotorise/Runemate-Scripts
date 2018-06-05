@@ -13,6 +13,6 @@
   <hidden>false</hidden>
   <open-source>true</open-source>
   <resources>
-    <resource>Bots/WC/AIO/GUI/WCController.fxml</resource>
+    <resource>Bots/Fisher/AIO/GUI/WCController.fxml</resource>
   </resources>
 </manifest>

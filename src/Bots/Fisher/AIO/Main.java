@@ -1,6 +1,7 @@
 package Bots.Fisher.AIO;
 
 import Bots.Fisher.AIO.GUI.GUIController;
+import Bots.Helper.StopWatch;
 import Bots.Helper.Util;
 import com.runemate.game.api.client.embeddable.EmbeddableUI;
 import com.runemate.game.api.hybrid.entities.GameObject;
@@ -22,13 +23,15 @@ import javafx.scene.Node;
 public class Main extends LoopingBot implements EmbeddableUI {
 
 	private boolean dropping;
-	private String fishAction, fishHole;
+	private String fishHoleAction, fishUtil, bait;
 	private long loopNum;
 	private int actionAnimation;
 	private GUIController controller;
-	private Area.Circular bankArea, fishArea;
+	private Area.Circular fishArea;
+	private Area bankArea;
 	private ObjectProperty<Node> botInterfaceProperty;
 	private Util util;
+	private StopWatch stopWatch;
 
 	public Main() {
 		actionAnimation = 879;
@@ -40,7 +43,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	public ObjectProperty<? extends Node> botInterfaceProperty() {
 		if (botInterfaceProperty == null) {
 			FXMLLoader loader = new FXMLLoader();
-			controller = new GUIController(util);
+			controller = new GUIController();
 			loader.setController(controller);
 			try {
 				Node n = loader.load(Resources.getAsStream("Bots/Fisher/AIO/GUI/WCController.fxml"));
@@ -55,9 +58,11 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	public void onStart(String... args) {
 		super.onStart();
 		//OSRS.LOGIN_HANDLER.disable();
+		stopWatch = new StopWatch();
 		util = new Util(this);
 		setLoopDelay(250, 401);
 		System.out.println("GUI starting");
+
 		try {
 			Execution.delayUntil(() -> {
 				System.out.println("Waiting for information");
@@ -67,35 +72,44 @@ public class Main extends LoopingBot implements EmbeddableUI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		System.out.println("Starting");
 
 		fishArea = util.generateAreaAroundEntity(Players.getLocal(), controller.getRad());
 		bankArea = controller.getBankA();
 		dropping = controller.isDropping();
-		fishHole = controller.getFishHoleName();
+		fishHoleAction = controller.getFishHoleAction();
+		fishUtil = controller.getFishUtil();
+		bait = controller.getBait();
+
 		System.out.println("/////////Variable details//////////");
-		System.out.println(fishArea);
-		System.out.println(bankArea);
-		System.out.println(dropping);
-		System.out.println(fishHole);
+		System.out.println("Fishing Area: " + fishArea);
+		System.out.println("Banking Area: " + bankArea);
+		System.out.println("Dropping: " + dropping);
+		System.out.println("Fishing Action: " + fishHoleAction);
+		System.out.println("Bait: " + bait);
 		System.out.println("/////////Variable details//////////");
+		stopWatch.start();
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
+		stopWatch.stop();
 		System.out.println("/////////////////Stopping////////////////////");
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
+		stopWatch.stop();
 		System.out.println("///////////////////Pausing////////////////////");
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
+		stopWatch.start();
 		System.out.println("////////////Resuming////////////");
 	}
 
@@ -108,7 +122,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 			fishWait();
 		}
 
-		GameObject t = util.getClosestGameObject(fishHole, fishAction);
+		GameObject t = util.getClosestGameObject("Fishing hole", fishHoleAction);
 		if (t != null) {
 			if (Math.random() < .25) {
 				Camera.turnTo(t);
@@ -121,7 +135,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 			} else if (!Players.getLocal().isMoving() && Players.getLocal().getAnimationId() != actionAnimation && t
 					.isValid()) {
 				System.out.println("Fishin");
-				t.interact(fishAction);
+				t.interact(fishHoleAction);
 				fishWait();
 			}
 		}
@@ -141,17 +155,18 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	}
 
 	private void bank() {
-		util.getplayerAction().bankAllExcept("axe");
+		util.getplayerAction()
+				.bankAllExcept(e -> e.getDefinition().getName().equals(fishUtil) || e.getDefinition().getName().equals(bait));
 	}
 
 	private void drop() {
-		util.getplayerAction().drop("log");
+		util.getplayerAction().drop(e -> !e.getDefinition().getName().equals(fishUtil) || e.getDefinition().equals(bait));
 	}
 
 	@Override
 	public void onLoop() {
 		loopNum++;
-		System.out.println("Loop Number: " + loopNum);
+		System.out.println("Loop Number: " + loopNum + "\t" + stopWatch.toString());
 		switch (getCurrentState()) {
 			case FISH:
 				fish();
@@ -171,7 +186,7 @@ public class Main extends LoopingBot implements EmbeddableUI {
 		}
 	}
 
-	//TODO logic for fishHole states
+	//TODO logic for fishHoleAction states
 	private State getCurrentState() {
 		if (Inventory.isFull() || util.getplayerAction().isTargeted()) {
 			if (!dropping) {

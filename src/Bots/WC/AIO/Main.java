@@ -26,7 +26,8 @@ public class Main extends LoopingBot implements EmbeddableUI {
 	private long loopNum;
 
 	private GUIController controller;
-	private Area.Circular bankArea, chopArea;
+	private Area.Circular chopArea;
+	private Area bankArea;
 	private ObjectProperty<Node> botInterfaceProperty;
 	private Util util;
 

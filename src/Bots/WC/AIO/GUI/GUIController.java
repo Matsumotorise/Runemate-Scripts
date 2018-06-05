@@ -3,8 +3,6 @@ package Bots.WC.AIO.GUI;
 import Bots.Helper.Location;
 import Bots.Helper.Util;
 import com.runemate.game.api.hybrid.location.Area;
-import com.runemate.game.api.hybrid.location.Area.Circular;
-import com.runemate.game.api.hybrid.location.Coordinate;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -32,7 +30,7 @@ public class GUIController implements Initializable {
 	private int rad, maxDelayUntilTreeDies;
 	private String tree;
 	private boolean dropping, waitingForGUI;
-	private Area.Circular bankA;
+	private Area bankA;
 	private Util util;
 
 
@@ -71,10 +69,10 @@ public class GUIController implements Initializable {
 
 		switch (bankArea.getSelectionModel().getSelectedIndex()) {
 			case 0:
-				bankA = (Area.Circular) Location.LUMBRIDGE_BANK.getArea();
+				bankA = Location.LUMBRIDGE_BANK.getArea();
 				break;
 			case 1:
-				bankA = (Area.Circular) Location.DRAYNOR_BANK.getArea();
+				bankA = Location.DRAYNOR_BANK.getArea();
 				break;
 		}
 
@@ -108,7 +106,7 @@ public class GUIController implements Initializable {
 		return waitingForGUI;
 	}
 
-	public Circular getBankA() {
+	public Area getBankA() {
 		return bankA;
 	}
 
